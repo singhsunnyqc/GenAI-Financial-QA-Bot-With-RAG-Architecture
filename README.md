@@ -6,4 +6,10 @@ The solution is self-contained where you would need to run only one file fin_bot
 
 - Works with Python3.13.1
 - Add your own OpenAPI key in env file
-- run `streamlint run app.py` to start the bot
+- run `streamlint run src/app.py` to start the bot
+
+
+## Responsible AI Features
+
+- Explainibility (Every bot response has a link to source)
+- Prevent hallucinations using system prompt
