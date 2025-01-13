@@ -4,4 +4,6 @@ The solution is self-contained where you would need to run only one file fin_bot
 - Runt the RAG application from the terminal by running 
 	python3 fin_bot.py OPENAI_API_KEY THE_QUESTION
 
-Works with Python3.13.1
+- Works with Python3.13.1
+- Add your own OpenAPI key in env file
+- run `streamlint run app.py` to start the bot

@@ -6,3 +6,4 @@
  langchain-openai
  lxml
  streamlit
+ python-dotenv

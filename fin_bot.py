@@ -16,7 +16,9 @@ from bs4 import BeautifulSoup
 import ssl
 import os
 import sys
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def get_sitemap(url):
     req = Request(
@@ -41,7 +43,7 @@ def get_urls(xml, name=None, data=None, verbose=False):
     return urls
 
 
-def scrape_site(url = "https://zerodha.com/varsity/chapter-sitemap2.xml"):
+def scrape_site(url = os.getenv("TRUTH_SOURCE")):
 	ssl._create_default_https_context = ssl._create_stdlib_context
 	xml = get_sitemap(url)
 	urls = get_urls(xml, verbose=False)
@@ -62,7 +64,7 @@ def vector_retriever(docs):
                                                chunk_overlap=200)
 	splits = text_splitter.split_documents(docs)
 	vectorstore = Chroma.from_documents(documents=splits,
-	                                    embedding=OpenAIEmbeddings())
+	                                    embedding=OpenAIEmbeddings(), persist_directory=os.getenv("CHROMA_PERSIST_DIRECTORY"))
 	return vectorstore.as_retriever()
 
 def create_chain():
@@ -87,22 +89,16 @@ def create_chain():
 	    ]
 	)
 
-	llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
+	llm = ChatOpenAI(model=os.getenv("MODEL"))
 
 	question_answer_chain = create_stuff_documents_chain(llm, prompt)
 	return create_retrieval_chain(retriever, question_answer_chain)
 
 
-if __name__ == "__main__":
-	if len(sys.argv) != 3:
-		print("Expected two arguments OPENAI_API_KEY and the question")
-		exit(1)
+rag_chain = create_chain()
 
-	print(len(sys.argv))
 
-	os.environ["OPENAI_API_KEY"] = sys.argv[1]
-	rag_chain = create_chain()
-	response = rag_chain.invoke({"input": sys.argv[2]})
-	print("-----------------")
-	print("Answer:")
-	print(response["answer"])
+def get_response(querry):
+	# rag_chain = create_chain()
+	response = rag_chain.invoke({"input": querry})
+	return response["answer"]
