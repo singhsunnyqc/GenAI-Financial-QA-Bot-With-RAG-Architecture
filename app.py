@@ -28,16 +28,13 @@ for message in st.session_state.messages:
 
 
 if prompt := st.chat_input("Please ask your question:"):
-    print("hi")
-    
     with st.chat_message("user"):
         st.markdown(prompt)
     
     st.session_state.messages.append({"role": "user", "content": prompt})
-    print("hi2")
+    
     response  = fin_bot.get_response(prompt)
-    print("hi3")
-    print("--------response to print---------")
+    
     print(response)
     with st.chat_message("assistant"):
         st.markdown(response)
