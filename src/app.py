@@ -34,7 +34,7 @@ for message in st.session_state.messages:
 
             if((len(response["context"]) > 0 and 'source' in response["context"][0].metadata)):
                 url = response["context"][0].metadata["source"]
-                st.markdown(f"{content} \n\n sources - [{url}](%s)" % url)
+                st.markdown(f"{content} \n\n sources - [{url}]({url})")
             else:
                 st.markdown(content)
 
@@ -56,7 +56,7 @@ if prompt := st.chat_input("Please ask your question:"):
         content = response["answer"]
 
         if(url != None):
-            st.markdown(f"{content} \n\n sources - [{url}](%s)" % url)
+            st.markdown(f"{content} \n\n sources - [{url}]({url})")
         else:
             st.markdown(content)
 

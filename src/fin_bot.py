@@ -71,7 +71,7 @@ def vector_retriever(docs):
 	splits = text_splitter.split_documents(docs)
 	vectorstore = Chroma.from_documents(documents=splits,
 	                                    embedding=OpenAIEmbeddings(), persist_directory=os.getenv("CHROMA_PERSIST_DIRECTORY"))
-	return vectorstore.as_retriever()
+	return vectorstore.as_retriever(search_type=os.getenv("SEARCH_TYPE"), search_kwargs={"k": int(os.getenv("VECTOR_DB_K")), "score_threshold": float(os.getenv("SCORE_THRESHOLD"))})
 
 def create_chain():
 	docs = scrape_site()
@@ -182,5 +182,9 @@ def get_response(querry):
 		HumanMessage(content=querry),
 		AIMessage(content=response["answer"])
 	])
+
+	print("------------")
+	print(response)
+	print("------------")
 
 	return response
