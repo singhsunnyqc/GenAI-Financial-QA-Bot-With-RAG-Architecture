@@ -45,7 +45,7 @@ if prompt := st.chat_input("Please ask your question:"):
         st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    response  = fin_bot.get_response(prompt)
+    response  = fin_bot.get_response(prompt, st.session_state.messages)
 
     url = None
 

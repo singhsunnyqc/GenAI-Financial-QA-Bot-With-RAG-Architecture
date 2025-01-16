@@ -6,64 +6,22 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
-from langchain_community.document_loaders import WebBaseLoader
 import bs4
 from langchain_community.document_loaders import RecursiveUrlLoader
 
 from langchain.chains import create_history_aware_retriever
 from langchain_core.prompts import MessagesPlaceholder
 from langchain_core.messages import AIMessage, HumanMessage
-
-from urllib.request import Request, urlopen
-from urllib.parse import urlparse
-from bs4 import BeautifulSoup
-import ssl
 import os
 import sys
 from dotenv import load_dotenv
+from setup_store import scrape_site;
 
 load_dotenv()
 
+
+
 chat_history = []
-
-def get_sitemap(url):
-    req = Request(
-        url=url,
-        headers={"User-Agent": "Mozilla/5.0"}
-    )
-    response = urlopen(req)
-    xml = BeautifulSoup(
-        response,
-        "lxml-xml",
-        from_encoding=response.info().get_param("charset")
-    )
-    return xml
-
-
-def get_urls(xml, name=None, data=None, verbose=False):
-    urls = []
-    for url in xml.find_all("url"):
-        if xml.find("loc"):
-            loc = url.findNext("loc").text
-            urls.append(loc)
-    return urls
-
-
-def scrape_site(url = os.getenv("TRUTH_SOURCE")):
-	ssl._create_default_https_context = ssl._create_stdlib_context
-	xml = get_sitemap(url)
-	urls = get_urls(xml, verbose=False)
-
-	docs = []
-	print("scarping the website ...")
-	for i, url in enumerate(urls):
-	    loader = WebBaseLoader(url)
-	    docs.extend(loader.load())
-	    if i % 10 == 0:
-	        print("\ti", i)
-	print("Done!")
-	return docs
-
 
 def vector_retriever(docs):
 	text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000,
@@ -173,9 +131,22 @@ def create_history_aware_chain():
 
 rag_chain = create_history_aware_chain()
 
+# Bot is stateless
+def get_chat_history(history_from_client):
+	chat_history = []
+	
+	for history_item in history_from_client:
+		if(history_item["role"] == "user"):
+			chat_history.append(HumanMessage(content=history_item["content"]))
+		elif(history_item["role"] == "assistant"):
+			chat_history.append(AIMessage(content=history_item["content"]))
+	
+	return chat_history;
 
-def get_response(querry):
-	# rag_chain = create_chain()
+
+def get_response(querry, history_from_client):
+	chat_history = get_chat_history(history_from_client)
+
 	response = rag_chain.invoke({"input": querry, "chat_history": chat_history})
 
 	chat_history.extend([
@@ -183,8 +154,8 @@ def get_response(querry):
 		AIMessage(content=response["answer"])
 	])
 
-	print("------------")
-	print(response)
-	print("------------")
+	# print("------------")
+	# print(response)
+	# print("------------")
 
 	return response
