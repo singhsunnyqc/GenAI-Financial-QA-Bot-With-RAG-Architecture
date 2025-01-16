@@ -1,8 +1,4 @@
 from langchain_openai import ChatOpenAI
-from langchain.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
@@ -15,25 +11,12 @@ from langchain_core.messages import AIMessage, HumanMessage
 import os
 import sys
 from dotenv import load_dotenv
-from setup_store import scrape_site;
+from setup_store import setup_store;
 
 load_dotenv()
-
-
-
-chat_history = []
-
-def vector_retriever(docs):
-	text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000,
-                                               chunk_overlap=200)
-	splits = text_splitter.split_documents(docs)
-	vectorstore = Chroma.from_documents(documents=splits,
-	                                    embedding=OpenAIEmbeddings(), persist_directory=os.getenv("CHROMA_PERSIST_DIRECTORY"))
-	return vectorstore.as_retriever(search_type=os.getenv("SEARCH_TYPE"), search_kwargs={"k": int(os.getenv("VECTOR_DB_K")), "score_threshold": float(os.getenv("SCORE_THRESHOLD"))})
+retriever = setup_store()
 
 def create_chain():
-	docs = scrape_site()
-	retriever = vector_retriever(docs)
 	# 2. Incorporate the retriever into a question-answering chain.
 	system_prompt = (
 	    "You are a financial assistant for question-answering tasks. "
@@ -60,9 +43,6 @@ def create_chain():
 
 
 def create_history_aware_chain():
-	docs = scrape_site()
-	retriever = vector_retriever(docs)
-
 	system_prompt = (
 	    "You are a financial assistant for question-answering tasks. "
 	    "Use the following pieces of retrieved context to answer "
@@ -70,6 +50,8 @@ def create_history_aware_chain():
 	    "don't know. Use five sentences maximum and keep the "
 	    "answer concise. Try to keep original content as much possible"
 	    "If the question is not clear ask follow up questions"
+		"Also, do not give any financial advice." 
+		"If user's querry asks for financial advice, just say that you cannot help with financial advice"
 	    "\n\n"
 	    "{context}"
 	)
@@ -132,7 +114,7 @@ def create_history_aware_chain():
 rag_chain = create_history_aware_chain()
 
 # Bot is stateless
-def get_chat_history(history_from_client):
+def create_context_from_history(history_from_client):
 	chat_history = []
 	
 	for history_item in history_from_client:
@@ -141,21 +123,11 @@ def get_chat_history(history_from_client):
 		elif(history_item["role"] == "assistant"):
 			chat_history.append(AIMessage(content=history_item["content"]))
 	
-	return chat_history;
+	return chat_history
 
 
 def get_response(querry, history_from_client):
-	chat_history = get_chat_history(history_from_client)
-
-	response = rag_chain.invoke({"input": querry, "chat_history": chat_history})
-
-	chat_history.extend([
-		HumanMessage(content=querry),
-		AIMessage(content=response["answer"])
-	])
-
-	# print("------------")
-	# print(response)
-	# print("------------")
+	context = create_context_from_history(history_from_client)
+	response = rag_chain.invoke({"input": querry, "chat_history": context})
 
 	return response
