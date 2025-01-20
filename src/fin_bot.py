@@ -11,7 +11,8 @@ from langchain_core.messages import AIMessage, HumanMessage
 import os
 import sys
 from dotenv import load_dotenv
-from setup_store import setup_store;
+from setup_store import setup_store
+from guardrails.output_guardrails import financial_advise_guardrails;
 
 load_dotenv()
 retriever = setup_store()
@@ -51,7 +52,7 @@ def create_history_aware_chain():
 	    "answer concise. Try to keep original content as much possible"
 	    "If the question is not clear ask follow up questions"
 		"Also, do not give any financial advice." 
-		"If user's querry asks for financial advice, just say that you cannot help with financial advice"
+		"If user's querry asks for financial advice, only say that you cannot help with financial advice."
 	    "\n\n"
 	    "{context}"
 	)
@@ -129,5 +130,8 @@ def create_context_from_history(history_from_client):
 def get_response(querry, history_from_client):
 	context = create_context_from_history(history_from_client)
 	response = rag_chain.invoke({"input": querry, "chat_history": context})
+
+	#TODO:: Refactor it to be part of chain
+	response = financial_advise_guardrails(response)
 
 	return response
