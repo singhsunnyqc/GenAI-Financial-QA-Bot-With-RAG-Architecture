@@ -30,12 +30,12 @@ The bot incorporates a range of Responsible AI principles designed to enhance tr
 
 - **Prevention of Hallucinations**: A system prompt is used to minimize the occurrence of fabricated or incorrect responses, ensuring that answers are grounded in reliable data.
 
-- **[WIP] Guardrails**: Multiple layers of protection are in place to ensure the bot’s outputs remain feasible, relevant, and ethical:
-  - **Input Guardrails**: Evaluate the feasibility and appropriateness of the user’s input.
-  - **Dialog Guardrails**: Monitor the flow of conversation to ensure logical coherence and relevance.
-  - **Retrieval Guardrails**: Assess the relevance and reliability of external information retrieved for answering queries.
-  - **Execution Guardrails**: Ensure that any actions or computations performed by the bot are feasible and accurate.
-  - **Output Guardrails**: Validate that the bot’s final responses are contextually accurate and appropriate.
+- **Guardrails**: Multiple layers of protection are in place to ensure the bot’s outputs remain feasible, relevant, and ethical:
+  - **Input Guardrails**: Implemented an input guardrail to ensure that the financial bot does not provide financial advice and adhere ethical AI system behaviour.
+  - **[WIP] Dialog Guardrails**: Monitor the flow of conversation to ensure logical coherence and relevance.
+  - **[WIP] Retrieval Guardrails**: Assess the relevance and reliability of external information retrieved for answering queries.
+  - **[WIP] Execution Guardrails**: Ensure that any actions or computations performed by the bot are feasible and accurate.
+  - **[WIP] Output Guardrails**: Training a cheap model using techniques like Transformers as Feature Extractor, Fine-Tuning Transformers, LoRa (Low Rank Adaptation), identify if the bot output contains any financial advice and filter them out to ensure that the bot adheres to ethical AI system behaviour.
 
  
 
