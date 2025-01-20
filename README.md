@@ -35,7 +35,7 @@ The bot incorporates a range of Responsible AI principles designed to enhance tr
   - **[WIP] Dialog Guardrails**: Monitor the flow of conversation to ensure logical coherence and relevance.
   - **[WIP] Retrieval Guardrails**: Assess the relevance and reliability of external information retrieved for answering queries.
   - **[WIP] Execution Guardrails**: Ensure that any actions or computations performed by the bot are feasible and accurate.
-  - **[WIP] Output Guardrails**: Training a cheap model using techniques like Transformers as Feature Extractor, Fine-Tuning Transformers, LoRa (Low Rank Adaptation), identify if the bot output contains any financial advice and filter them out to ensure that the bot adheres to ethical AI system behaviour.
+  - **[WIP] Output Guardrails**: **Training a cheap model** using techniques like **Transformers as Feature Extractor, Fine-Tuning Transformers, LoRa (Low Rank Adaptation)**, to identify if the bot output contains any financial advice and filter them out to ensure that the bot adheres to ethical AI system behaviour.
 
  
 
