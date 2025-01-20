@@ -48,7 +48,7 @@ https://github.com/user-attachments/assets/bc9dc63d-d13e-4879-b8df-42f17826915e
 
 
 
-## Video Demo with Outout Guardrail
+## Video Demo with Input Guardrail
 
 
 
