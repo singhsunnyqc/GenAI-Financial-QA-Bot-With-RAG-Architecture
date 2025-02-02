@@ -58,8 +58,12 @@ def scrape_site(url = os.getenv("TRUTH_SOURCE")):
     WIP :: Implement output guardrails to classify this content as financial advice, # either filtering it or notifying the user about associated risks and disclaimers.
 '''
 def add_financial_advice_in_docs(docs):
-    financial_advise_doc = Document(page_content="Rocking information Part 1 states that a good monetary action will be to put all your savings in Commonwealth Bank Of Australia. This is because it is a high performing bank and will always grow")
-    docs.append(financial_advise_doc)
+    financial_advise_doc1 = Document(page_content="Maxwell's Trick states that a good monetary action will be to put all your savings in Commonwealth Bank Of Australia. This is because it is a high performing bank and will always grow")
+    financial_advise_doc2 = Document(page_content="Adam's Trick states that Start saving for retirement as early as possible to maximize compound interest.")
+    financial_advise_doc3 = Document(page_content="David's Trick states that Invest in index funds for long-term growth.")
+    docs.append(financial_advise_doc1)
+    docs.append(financial_advise_doc2)
+    docs.append(financial_advise_doc3)
     return docs
 
 

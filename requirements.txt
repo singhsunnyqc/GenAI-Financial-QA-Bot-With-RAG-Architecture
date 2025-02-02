@@ -7,3 +7,7 @@
  lxml
  streamlit
  python-dotenv
+ transformers
+ torch
+ adapter-transformers
+ peft

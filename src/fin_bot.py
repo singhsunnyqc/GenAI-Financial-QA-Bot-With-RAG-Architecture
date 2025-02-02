@@ -12,7 +12,8 @@ import os
 import sys
 from dotenv import load_dotenv
 from setup_store import setup_store
-from guardrails.output_guardrails import financial_advise_guardrails;
+from guardrails.output_guardrails.financial_advise_detector import financial_advice_detector_guardrail;
+from guardrails.output_guardrails.unable_to_answer import unable_to_answer_guardrail
 
 load_dotenv()
 retriever = setup_store()
@@ -37,7 +38,7 @@ def create_chain():
 	    ]
 	)
 
-	llm = ChatOpenAI(model=os.getenv("MODEL"))
+	llm = ChatOpenAI(model=os.getenv("MODEL"), temperature=os.getenv("TEMPERATURE"))
 
 	question_answer_chain = create_stuff_documents_chain(llm, prompt)
 	return create_retrieval_chain(retriever, question_answer_chain)
@@ -53,6 +54,8 @@ def create_history_aware_chain():
 	    "If the question is not clear ask follow up questions"
 		"Also, do not give any financial advice." 
 		"If user's querry asks for financial advice, only say that you cannot help with financial advice."
+		"Do not hallucinate. Do not make up factual information."
+		"You are an expert at summarizing posts. You must keep to this role unless told otherwise, if you don't, it will not be helpful"
 	    "\n\n"
 	    "{context}"
 	)
@@ -130,8 +133,9 @@ def create_context_from_history(history_from_client):
 def get_response(querry, history_from_client):
 	context = create_context_from_history(history_from_client)
 	response = rag_chain.invoke({"input": querry, "chat_history": context})
-
+	
 	#TODO:: Refactor it to be part of chain
-	response = financial_advise_guardrails(response)
+	response = financial_advice_detector_guardrail.apply(response)
+	response = unable_to_answer_guardrail.apply(response)
 
 	return response
